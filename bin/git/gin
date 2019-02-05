@@ -1,0 +1,16 @@
+#!/bin/bash
+
+dir=`dirname $0`
+source "$dir/gitfunc"
+
+USAGE="Usage: gin
+pull current branch\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+git pull origin `current_branch 1`

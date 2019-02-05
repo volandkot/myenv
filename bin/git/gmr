@@ -1,0 +1,21 @@
+#!/bin/bash
+
+dir=`dirname $0`
+source "$dir/gitfunc"
+
+USAGE="Usage: gmr <pattern>
+merge branch (mnemonic Git MeRge)\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+if [[ -z $1 ]]; then
+    echo $USAGE && exit 0
+fi
+
+ask_branch BRANCH $1
+git merge --no-ff $BRANCH

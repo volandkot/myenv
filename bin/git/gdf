@@ -1,0 +1,28 @@
+#!/bin/bash
+
+dir=`dirname $0`
+source "$dir/gitfunc"
+
+USAGE="Usage: gdf <commit>
+Start diff. (mnemonic Git DiFf)\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+commit=$1
+
+if [[ -z "$commit" ]]; then
+    commit='HEAD~1'
+elif [[ "$commit" =~ ^0$ ]]; then
+    commit=''   
+elif [[ "$commit" =~ ^[0-9]+$ ]]; then
+    commit="HEAD~$commit"
+fi
+
+echo -e "SHOW DIFF WITH $commit\n"
+
+git diff -w -b --color --ignore-space-at-eol $commit

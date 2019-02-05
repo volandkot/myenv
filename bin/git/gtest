@@ -1,0 +1,33 @@
+#!/bin/bash
+
+test_branch=$1
+if [[ -z $test_branch ]]; then
+    test_branch=`echo $GIT_TEST_BRANCH`
+fi
+if [[ -z $test_branch ]]; then
+    test_branch="alpha"
+fi
+
+dir=`dirname $0`
+source "$dir/gitfunc"
+
+USAGE="Usage: gtest [<test_branch>]
+switch to $test_branch (from arg|env GIT_TEST_BRANCH|alpha) && merge current branch && turn back\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+echo "Test branch is $test_branch"
+
+GIT_BRANCH=`current_branch 1`
+
+if [[ "$GIT_BRANCH" == $test_branch ]]; then
+    echo "already in $test_branch"
+    exit 0
+fi
+
+git checkout $test_branch && gin && git merge --no-ff $GIT_BRANCH && gout && ghead && git checkout $GIT_BRANCH

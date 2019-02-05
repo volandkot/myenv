@@ -1,0 +1,13 @@
+#!/bin/bash
+
+USAGE="Usage: greset <commit>
+git reset --hard (mnemonic Git RESET)\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+git reset --hard $1

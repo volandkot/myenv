@@ -1,0 +1,39 @@
+#!/bin/bash
+
+dir=`dirname $0`
+source "$dir/gitfunc"
+
+USAGE="Usage: greview <dest-branch> [<src-branch>]
+show diff after merging src-branch to dest-branch\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+if [[ -z $1 ]]; then
+    echo $USAGE && exit 0
+fi
+
+DEST=$1
+SRC=$2
+
+if [[ -z $SRC ]]; then
+    CURRENT_BRANCH=`current_branch 1`
+    if [[ -z $CURRENT_BRANCH ]]; then
+        echo "Can't define current branch" && exit 0;
+    fi
+    SRC=$CURRENT_BRANCH
+fi
+
+git fetch
+
+printf "Checkout $DEST:\n"
+git checkout $DEST
+git pull origin $DEST
+printf "Merge origin/$SRC to $DEST:\n"
+git merge --no-ff --no-commit origin/$SRC
+printf "Show diff:\n"
+git diff -w HEAD

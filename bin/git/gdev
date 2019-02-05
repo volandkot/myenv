@@ -1,0 +1,34 @@
+#!/bin/bash
+
+dev_branch=$1
+if [[ -z $dev_branch ]]; then
+    dev_branch=`echo $GIT_DEV_BRANCH`
+fi
+if [[ -z $dev_branch ]]; then
+    dev_branch="dev"
+fi
+
+dir=`dirname $0`
+source "$dir/gitfunc"
+
+USAGE="Usage: gdev [<dev_branch>]
+switch to $dev_branch (from arg|env GIT_DEV_BRANCH|dev) && merge current branch && turn back\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+echo "Dev branch is $dev_branch"
+
+GIT_BRANCH=`current_branch 1`
+
+if [[ "$GIT_BRANCH" == $dev_branch ]]; then
+    echo "already in $dev_branch"
+    exit 0
+fi
+
+git checkout $dev_branch && gin && git merge --no-ff $GIT_BRANCH && gout && ghead && git checkout $GIT_BRANCH
+

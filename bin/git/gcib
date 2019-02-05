@@ -1,0 +1,46 @@
+#!/bin/bash
+
+dir=`dirname $0`
+source "$dir/gitfunc"
+
+USAGE="Usage: gcib <dest-branch> [<commit>]
+check current branch (or commit) in <dest-branch> (mnemonic Git Commit In Branch)\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+if [[ -z $1 ]]; then
+    echo $USAGE && exit 0
+fi
+
+ask_branch BRANCH $1
+
+CURRENT_BRANCH=`current_branch`
+if [[ -z $CURRENT_BRANCH ]]; then
+    echo "Can't define current branch" && exit 0; 
+fi
+
+FOUND=''
+HEAD_COMMIT=''
+if [[ $2 ]]; then
+    HEAD_COMMIT=$2;
+else
+    HEAD_COMMIT=`git log -1 --no-color | head -n1 | sed 's/^commit //'`;
+fi
+
+if [[ -z $HEAD_COMMIT ]]; then
+    echo "Can't define head commit of branch $CURRENT_BRANCH" && exit 0;
+else 
+    FOUND=`git branch -a --contains $HEAD_COMMIT | grep $BRANCH`
+    echo "$FOUND"
+fi
+
+if [[ -z $FOUND ]]; then
+    echo "Commit $HEAD_COMMIT not in $BRANCH";
+else 
+    echo "Commit $HEAD_COMMIT already in $BRANCH";
+fi

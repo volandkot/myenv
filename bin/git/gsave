@@ -1,0 +1,14 @@
+#!/bin/bash
+
+USAGE="Usage: gsave
+add all files and call \`git commit -a\`\n"
+
+while getopts ":h" opt;
+do
+    case $opt in
+        h) printf "$USAGE" && exit 0;;
+    esac
+done
+
+git add .
+git commit -a

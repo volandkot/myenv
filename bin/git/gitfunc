@@ -1,0 +1,64 @@
+#!/bin/bash
+
+current_branch() {
+    local GIT_BRANCH="$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+    if [[ "$GIT_BRANCH" == *'(no branch)'* ]]; then
+        if [[ $1 ]]; then
+            exit 0
+        else
+            echo ''
+        fi
+    else
+        echo $GIT_BRANCH  
+    fi
+}
+
+
+find_branch() {
+    local command='git branch --no-color'
+    if [[ $2 ]]; then
+        echo `$command -a 2> /dev/null | grep $1 | grep origin | sed -e 's/^*/ /'`
+    else
+        echo `$command 2> /dev/null | grep $1 | sed -e 's/^*/ /'`
+    fi
+}
+
+ask_branch() {
+   local found=`find_branch $2 $3`
+   if [[ `echo $found | wc -w` -eq 1 ]]; then
+       eval $1="$found"
+   else
+       local num=1
+       for branch in $found
+       do
+           printf "%2d %s\n" $num $branch
+           num=`expr $num + 1`
+       done
+       if [[ $num -eq 1 ]]; then
+           printf "no branch found\n"
+           exit 0
+       fi
+       read num;
+       num="\$$num"
+       branch=`echo $found | awk "{ print $num }"` 
+       if [[ -z $branch ]]; then
+           printf "no brach selected"
+           exit 0
+       else
+           eval $1="$branch" 
+       fi
+   fi 
+}
+
+usage(){
+    echo "$*"
+    while getopts ":h" $1 opt;
+    do
+        echo "OPT $opt"
+        case $opt in
+            h) echo $USAGE && exit 0;;
+        esac
+    done
+    shift $((OPTIND-1)); OPTIND=1
+}
+
