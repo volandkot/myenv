@@ -7,12 +7,15 @@ fi
 
 # User specific environment and startup programs
 
-export PATH=$PATH:$HOME/bin:/usr/local/bin:$HOME/bin/git
+export NO_DEPRECATED_WARNINGS=1
+export FAKE_RELEASE=1
+
+export PATH=$HOME/bin:/usr/local/bin:$HOME/bin/git:$PATH
 
 export GOPATH=$HOME/work/go
 
 unset USERNAME
-export LANG=ru_RU.UTF8
+export LANG=en_US.UTF8
 
 shopt -s cdspell
 shopt -s cmdhist
@@ -46,3 +49,6 @@ alias itmux='tmux attach || tmux new'
 if [ -f /etc/bash_completion ]; then
 . /etc/bash_completion
 fi
+
+tbk(){ if [ $# -eq 0 ];then echo "No arguments specified.\nUsage:\n transfer <file|directory>\n ... | transfer <file_name>">&2;return 1;fi;if tty -s;then file="$1";file_name=$(basename "$file");if [ ! -e "$file" ];then echo "$file: No such file or directory">&2;return 1;fi;if [ -d "$file" ];then file_name="$file_name.zip" ,;(cd "$file"&&zip -r -q - .)|curl --progress-bar --upload-file "-" "https://t.bk.ru/$file_name"|tee /dev/null,;else cat "$file"|curl --progress-bar --upload-file "-" "https://t.bk.ru/$file_name"|tee /dev/null;fi;else file_name=$1;curl --progress-bar --upload-file "-" "https://t.bk.ru/$file_name"|tee /dev/null;fi;}
+
